@@ -1,0 +1,6 @@
+Django>=5.0
+redis>=5.0
+orjson>=3.9
+psycopg2-binary>=2.9
+locust>=2.23
+gunicorn>=21.2
