@@ -18,6 +18,7 @@ end
 redis.call('DECR',item_key)
 redis.call('SADD',purchase_set_key,user_id)
 
-local payload = '{"user_id": "' .. userId .. '","item_id": '..item_key..',"timestamp": "' .. timestamp .. '"}'
+local payload = '{"user_id": "' .. user_id .. '","item_id": '..item_key..',"timestamp": "' .. timestamp .. '"}'
 
 redis.call('RPUSH',outbox_key,payload)
+return 1

@@ -1,9 +1,10 @@
 import redis
 import orjson
-from .models import InventoryItem,Order
+from ...models import InventoryItem,Order
 from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.db.models import F
+from collections import defaultdict
 
 class Command(BaseCommand):
     help = 'Process outbox orders and update inventory'
@@ -25,7 +26,8 @@ class Command(BaseCommand):
                     break
                 
                 
-            orders_to_create = item_deductions = {}
+            orders_to_create = []
+            item_deductions = defaultdict(int)
                 
             for raw_data in batch:
                 if raw_data:

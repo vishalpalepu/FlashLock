@@ -1,6 +1,6 @@
 import orjson
 import redis
-from .models import InventoryItem, Order
+from ...models import InventoryItem, Order
 from django.db import transaction
 from django.core.management.base import BaseCommand
 

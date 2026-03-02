@@ -79,11 +79,10 @@ class HighSpeedPurchaseView(View):
         
             if user_id is None:
                 return JsonResponse({'status': 'error', 'message': 'User ID is required'}, status=400)
-        
+            
             result = attempt_purchase(user_id,item_id,str(time.time()))
         
             if(result == 1):
-                print()(f"User {user_id} successfully purchased item {item_id}")
                 return JsonResponse({'status': 'success', 'message': 'Purchase successful'})
             elif(result == -1):
                 print()(f"User {user_id} attempted to purchase item {item_id} but has already purchased it")
@@ -92,6 +91,8 @@ class HighSpeedPurchaseView(View):
                 return JsonResponse({'status': 'failed', 'message': 'Sold Out'}, status=400)
             elif (result == -2):
                 return JsonResponse({'status': 'error', 'message': 'Redis error occurred'}, status=500)
+            elif(result == -3):
+                return JsonResponse({'status': 'error', 'message': 'Rate limit exceeded'}, status=429)
         
         except Exception as e:
             print(f"CRASH REASON: {str(e)}")
