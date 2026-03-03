@@ -12,15 +12,14 @@ class Command(BaseCommand):
     def handle(self,*args,**kwargs):
         redis_conn = redis.Redis(host = "localhost",port = 6379, decode_responses = True)
         outbox_key = "orders_queue"
-        processing_key = "processing_orders"
         
         BATCH_SIZE = 50
         self.stdout.write("Worker started. Waiting for orders...")
         while True:
-            data = redis_conn.brpoplpush(outbox_key,processing_key,timeout = 0)
+            _ , data = redis_conn.blpop(outbox_key)
             batch = [data]
             for _ in range(BATCH_SIZE - 1):
-                item = redis_conn.brpoplpush(outbox_key,processing_key,timeout = 0)
+                item = redis_conn.lpop(outbox_key)
                 if item:
                     batch.append(item)
                 else:
@@ -50,10 +49,7 @@ class Command(BaseCommand):
                     
                         for current_item_id , sold_count in item_deductions.items():
                             InventoryItem.objects.filter(id = current_item_id).update(stock_count = F('stock_count') - sold_count)
-                    
-                    for raw_data in batch:
-                        redis_conn.lrem(processing_key,1,raw_data)
-                    self.stdout.write(f"Successfully processed and cleared a batch of {len(orders_to_create)} orders.")   
+                    self.stdout.write(f"Processed batch of {len(orders_to_create)} orders")   
                 except Exception as e:
                     self.stdout.write(f"Database error processing batch: {str(e)}")
                     
