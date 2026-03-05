@@ -171,7 +171,7 @@ wrk -t4 -c500 -d30s -s load_tests/script/purchase_high_speed.lua --latency <http
 
 _(Note: If running wrk inside WSL against Waitress on Windows, replace 172.x.x.x with your Windows host IP found via cat /etc/resolv.conf.)_
 
-- **The Direct Results (Locally)**
+ **The Direct Results (Locally)**
 
 | **Metric** | **Target** | **Actual Result** | **Status** |
 | --- | --- | --- | --- |
