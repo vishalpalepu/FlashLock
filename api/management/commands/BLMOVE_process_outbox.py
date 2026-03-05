@@ -19,7 +19,9 @@ class Command(BaseCommand):
         
         while True:
 
-            data = redis_conn.blmove(outbox_key, processing_key, 'RIGHT', 'LEFT', timeout=0)
+            data = redis_conn.blmove(outbox_key, processing_key, 'RIGHT', 'LEFT',0)
+            if not data:
+                continue
             batch = [data]
             
             # 2. The Fast Gather (Non-Blocking)
@@ -66,7 +68,7 @@ class Command(BaseCommand):
                     # 5. EXPLICIT DELETION (The Acknowledgment)
                     # This code ONLY runs if the Postgres transaction was 100% successful.
                     for raw_data in batch:
-                        redis_conn.lrem(processing_key, 1, raw_data)
+                        redis_conn.rpop(processing_key, 1, raw_data)
                         
                     self.stdout.write(f"Successfully processed and cleared a batch of {len(orders_to_create)} orders.")
                     

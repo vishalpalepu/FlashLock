@@ -20,7 +20,7 @@ class Command(BaseCommand):
             data = redis_conn.brpoplpush(outbox_key,processing_key,timeout = 0)
             batch = [data]
             for _ in range(BATCH_SIZE - 1):
-                item = redis_conn.brpoplpush(outbox_key,processing_key,timeout = 0)
+                item = redis_conn.rpoplpush(outbox_key,processing_key) #donot use timeout=0 because it blocks until it gets 50 orders which is not ideal for less than 50 orders scenario
                 if item:
                     batch.append(item)
                 else:

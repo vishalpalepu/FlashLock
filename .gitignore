@@ -73,3 +73,9 @@ dist/
 # Load Testing / Temp
 # ============================================================
 load_tests/*.log
+
+# Ignore all document files
+*.doc
+*.docx
+*.pdf
+*.rtf

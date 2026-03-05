@@ -81,6 +81,7 @@ DATABASES = {
         'PASSWORD' : 'a@h-g&j+v:',
         'HOST' : 'localhost',
         'PORT' : '5432',
+        'CONN_MAX_AGE': None,
     }
 }
 

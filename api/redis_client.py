@@ -33,7 +33,7 @@ def attempt_purchase(user_id, item_id,timestamp):
         
         rate_limit_key = f"rate_limit:{user_id}" #change to IP in production
         capacity = 5
-        refill_rate = 10  # Refill 10 tokens every refill_interval seconds
+        refill_rate = 20  # Refill 10 tokens every refill_interval seconds
         refill_interval = 60  # Refill every 60 seconds
         now = time.time()
         
