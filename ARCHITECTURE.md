@@ -80,3 +80,42 @@ Opening a new TCP connection for every request is a performance anti-pattern due
 - **High Availability:** Transition to Redis Cluster (requiring careful hash-tag key design) to eliminate single points of failure.
 - **Dead Letter Queues:** Implement secondary queues for handling failed worker commits to Postgres.
 - **Periodic Reconciliation:** Automated tasks to verify that Redis Count + Total Orders = Initial Inventory, detecting any drift from catastrophic crashes.
+
+## 7\.Design Flow
+graph TD
+    subgraph "Layer 1: The Client"
+        A[Locust / wrk] -- "POST /api/purchase_high_speed/" --> B
+    end
+
+    subgraph "Layer 2: The Web Layer (Waitress/Django)"
+        B -- "Thread Pool (50 threads)" --> C
+        C -- "Bypasses DRF Serializers" --> D
+    end
+
+    subgraph "Layer 3: The State Layer (Hot Path - Redis)"
+        D
+        D --> D1{Rate Limit?}
+        D1 -- "Token Bucket" --> D2{Idempotent?}
+        D2 -- "User ID Check" --> D3{Stock > 0?}
+        D3 -- "DECR Stock" --> D4
+    end
+
+    subgraph "Layer 4: The Reliable Queue"
+        D4 --> E[(orders_queue)]
+        E -- "BLMOVE / BRPOPLPUSH" --> F[(processing_queue)]
+    end
+
+    subgraph "Layer 5: The Worker (Cold Path - Django)"
+        F --> G
+        G -- "Batch Gathering (LMOVE)" --> H
+    end
+
+    subgraph "Layer 6: The Archive (PostgreSQL)"
+        H -- "bulk_create()" --> I
+        H -- "F() expression decrement" --> J
+        I & J -- "Commit Success" --> K
+    end
+
+    style D fill:#f96,stroke:#333,stroke-width:2px
+    style G fill:#3498db,stroke:#fff,stroke-width:2px
+    style I fill:#2ecc71,stroke:#333,stroke-width:2px
