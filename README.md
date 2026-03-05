@@ -90,7 +90,7 @@ venv\\Scripts\\activate
 python -m waitress --listen=127.0.0.1:8000 --threads=50 --connection-limit=1000 FlashLock.wsgi:application  
 ```
 
-### Terminal 2: The Background Worker
+## Terminal 2: The Background Worker
 
 Start a background worker to relay data from the Redis outbox queue into PostgreSQL.
 
